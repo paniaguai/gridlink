@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="Title" content="🤗 GridLink @gridlink">
+<meta name="Keywords" content="gridlink link paniaguai portal start grid link google point click">
+<base target="_blank">
+<title>🤗 GridLink @gridlink</title>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="https://paniaguai.github.io/gridlink/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14122b;
+  --cyan:#00b8ff;
+  --violet:#7c3aed;
+  --line:rgba(110,80,220,.14);
+  --tile-a:#ffffff;
+  --tile-b:#f5f3ff;
+  --gap:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:"Space Grotesk",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+  background-color:#fff;
+  /* faint technical grid + soft light aurora, white stays dominant */
+  background-image:
+    radial-gradient(60% 40% at 15% 0%,rgba(0,184,255,.10),transparent 70%),
+    radial-gradient(55% 40% at 90% 8%,rgba(124,58,237,.10),transparent 70%),
+    linear-gradient(rgba(90,70,200,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(90,70,200,.045) 1px,transparent 1px);
+  background-size:auto,auto,36px 36px,36px 36px;
+  background-attachment:fixed;
+}
+
+/* Side margins live on the page container (longhand so nothing zeroes them out) */
+.page{
+  width:100%;
+  max-width:1200px;
+  margin-left:auto;
+  margin-right:auto;
+  padding-left:max(clamp(18px,7vw,120px),env(safe-area-inset-left,0px));
+  padding-right:max(clamp(18px,7vw,120px),env(safe-area-inset-right,0px));
+  padding-top:max(clamp(16px,3vw,32px),env(safe-area-inset-top,0px));
+  padding-bottom:max(clamp(24px,5vw,60px),env(safe-area-inset-bottom,0px));
+}
+
+/* Top bar */
+.bar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:clamp(14px,3vw,28px);
+}
+.pill,.sound{
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;
+  height:44px;border-radius:999px;
+  color:var(--ink);text-decoration:none;cursor:pointer;
+  font-family:inherit;font-size:15px;font-weight:600;letter-spacing:.02em;
+  background:linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,var(--cyan),var(--violet)) border-box;
+  border:1.5px solid transparent;
+  box-shadow:0 8px 22px -12px rgba(124,58,237,.55);
+  transition:transform .2s ease,box-shadow .2s ease,color .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.pill{padding-left:22px;padding-right:22px}
+.sound{width:44px;padding:0}
+.pill:hover,.sound:hover{transform:translateY(-2px);box-shadow:0 12px 26px -10px rgba(0,184,255,.6)}
+.pill:active,.sound:active{transform:scale(.97)}
+.pill:focus-visible,.sound:focus-visible,.cell:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
+.sound svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sound .waves{transition:opacity .2s ease}
+.sound[aria-pressed="false"] .waves{opacity:0}
+.sound .mute{opacity:0;transition:opacity .2s ease}
+.sound[aria-pressed="false"] .mute{opacity:1}
+.sound[aria-pressed="true"]{color:var(--violet)}
+
+/* Grid */
+.grid{
+  width:100%;max-width:980px;margin-left:auto;margin-right:auto;
+  display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:auto;gap:var(--gap);
+}
+.wide{
+  grid-column:1/-1;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  width:100%;max-width:300px;margin-left:auto;margin-right:auto;
+  padding-top:4px;padding-bottom:12px;
+  overflow:hidden;
+  border-radius:20px;
+}
+.wide .twitter-tweet,.wide .twitter-timeline{max-width:100%!important}
+
+.cell{
+  position:relative;
+  height:132px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-decoration:none;color:var(--ink);border-radius:22px;
+  font-size:15px;font-weight:500;line-height:1.15;text-align:center;letter-spacing:.01em;
+  background:linear-gradient(145deg,var(--tile-a),var(--tile-b));
+  border:1px solid var(--line);
+  box-shadow:0 10px 24px -18px rgba(70,50,190,.5);
+  overflow:hidden;
+  isolation:isolate;
+  transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+  -webkit-tap-highlight-color:transparent;
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) both;
+  animation-delay:calc(var(--i,0) * 18ms);
+}
+/* neon edge */
+.cell::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;
+  background:linear-gradient(130deg,var(--cyan),var(--violet));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  opacity:0;transition:opacity .25s ease;pointer-events:none;
+}
+/* light sweep */
+.cell::after{
+  content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;z-index:-1;
+  background:linear-gradient(100deg,transparent,rgba(0,184,255,.16),transparent);
+  transform:skewX(-18deg);pointer-events:none;
+}
+.cell img{display:block;border:0;max-width:62%;height:auto;transition:transform .3s cubic-bezier(.34,1.56,.64,1),filter .3s ease}
+.cell span{margin-top:6px;transition:color .25s ease,transform .25s ease}
+
+@media(hover:hover){
+  .cell:hover{transform:translateY(-4px);box-shadow:0 18px 32px -16px rgba(0,184,255,.55),0 0 0 4px rgba(124,58,237,.06)}
+  .cell:hover::before{opacity:1}
+  .cell:hover::after{left:130%;transition:left .7s ease}
+  .cell:hover img{transform:scale(1.1) rotate(-3deg);filter:drop-shadow(0 8px 10px rgba(60,40,200,.28))}
+  .cell:hover span{color:var(--violet);transform:translateY(1px)}
+}
+.cell:active{transform:scale(.97)}
+.cell:focus-visible::before{opacity:1}
+
+.empty{visibility:hidden;animation:none;border:0;box-shadow:none;background:none}
+.empty::before,.empty::after{display:none}
+
+@keyframes rise{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+
+/* Tablet & phone */
+@media(max-width:900px){
+  .grid{grid-template-columns:repeat(3,1fr);max-width:640px}
+  .empty{display:none}
+  .cell{height:112px;font-size:14px}
+}
+@media(max-width:420px){
+  :root{--gap:9px}
+  .cell{height:98px;font-size:12.5px;border-radius:18px}
+  .cell img{max-width:58%}
+  .pill{height:42px;font-size:14px;padding-left:18px;padding-right:18px}
+  .sound{height:42px;width:42px}
+}
+@media(prefers-reduced-motion:reduce){
+  .cell,.cell img,.cell span,.pill,.sound,.cell::after{transition:none!important;animation:none!important}
+  .cell:hover{transform:none}
+}
+</style>
+</head>
+
+<body>
+<div class="page">
+
+  <div class="bar">
+    <a class="pill" href="https://easylandx.github.io" data-sfx="click">EasyLandX</a>
+    <button class="sound" id="sound" type="button" aria-pressed="false" aria-label="Sound effects" title="Sound effects" target="_self">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/>
+        <g class="waves"><path d="M15.5 9a4.2 4.2 0 0 1 0 6"/><path d="M18 6.5a8 8 0 0 1 0 11"/></g>
+        <path class="mute" d="M16 9.5l5 5M21 9.5l-5 5"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="grid">
+
+    <!-- EMBEDDED X POST -->
+    <div class="wide">
+      <a class="twitter-timeline" data-width="300" data-height="300" data-tweet-limit="1" data-theme="light" href="https://x.com/paniaguai?ref_src=twsrc%5Etfw" data-chrome="noheader nofooter noscrollbar noborders transparent"> </a>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+      <blockquote class="twitter-tweet" data-width="300" data-theme="light"><p lang="en" dir="ltr">Productivity improves when the mind rests. PawVibesZ live Zoom sessions with cats. Reset in just a few minutes. Bookings now open. <a href="https://t.co/9gS9Ps99WB">https://t.co/9gS9Ps99WB</a> <a href="https://t.co/RAnmkwGyvc">pic.twitter.com/RAnmkwGyvc</a></p>&mdash; paniaguai (@paniaguai) <a href="https://twitter.com/paniaguai/status/2021530450276057539?ref_src=twsrc%5Etfw">February 11, 2026</a></blockquote>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </div>
+
+    <!-- Row 1 -->
+    <a class="cell" href="https://paniaguai.github.io/gridlink/"><img width="96" height="96" src="gridlink802_files/image002.png" alt=":Y0aj5NCy_400x400.jpg"><span>GridLink</span></a>
+    <a class="cell" href="http://youtube.com/"><img width="83" height="83" src="gridlink802_files/image004.png" alt=":aQltRN9T_400x400.jpg"><span>Youtube</span></a>
+    <a class="cell" href="http://x.com/"><img width="72" height="72" src="gridlink802_files/image006.png" alt=":download.png"><span>X</span></a>
+    <a class="cell" href="http://instagram.com/"><img width="71" height="71" src="gridlink802_files/image008.png" alt=":insta.png"><span>Instagram</span></a>
+    <a class="cell" href="http://www.facebook.com/"><img width="78" height="78" src="gridlink802_files/image010.png" alt=":X4G0h2LY_400x400.png"><span>Facebook</span></a>
+
+    <!-- Row 2 -->
+    <a class="cell" href="http://www.google.com/"><img width="75" height="75" src="gridlink802_files/image012.png" alt=":PSpUS-Hp_400x400.jpg"><span>Google</span></a>
+    <a class="cell" href="http://www.google.com/calendar/"><img width="95" height="88" src="gridlink802_files/image014.png" alt=":calendar.png"><span>Calendar</span></a>
+    <a class="cell" href="https://photos.google.com/"><img width="96" height="92" src="gridlink802_files/image016.png" alt=":photos.png"><span>Photos</span></a>
+    <a class="cell" href="https://www.messenger.com"><img width="93" height="87" src="gridlink802_files/image018.png" alt=":messenger.png"><span>Messenger</span></a>
+    <a class="cell" href="https://www.whatsapp.com/"><img width="93" height="93" src="gridlink802_files/image020.png" alt=":48356938_1058474794362945_7347043134678761472_n.jpg"><span>WhatsApp</span></a>
+
+    <!-- Row 3 -->
+    <a class="cell" href="http://drive.google.com"><img width="97" height="85" src="gridlink802_files/image022.png" alt=":drive.png"><span>Drive</span></a>
+    <a class="cell" href="http://mail.google.com/"><img width="92" height="77" src="gridlink802_files/image024.png" alt=":mail.png"><span>GMail</span></a>
+    <div class="cell empty"></div>
+    <a class="cell" href="https://chatgpt.com/"><img width="87" height="87" src="gridlink802_files/image040.png" alt=":Z5pUSDeE_400x400.jpg"><span>ChatGPT</span></a>
+    <a class="cell" href="https://copilot.microsoft.com/"><img width="71" height="71" src="gridlink802_files/copilot.png" alt=":download.png"><span>Copilot</span></a>
+
+    <!-- Row 4 -->
+    <a class="cell" href="http://outlook.com/"><img width="116" height="89" src="gridlink802_files/image030.png" alt=":Untitled2.png"><span>Outlook</span></a>
+    <a class="cell" href="http://www.linkedin.com/"><img width="92" height="92" src="gridlink802_files/image032.png" alt=":48381139_202567957355824_6698931384301387776_n.jpg"><span>Linkedin</span></a>
+    <div class="cell empty"></div>
+    <a class="cell" href="https://www.google.com/maps"><img width="77" height="77" src="gridlink802_files/image026.png" alt=""><span>Maps</span></a>
+    <a class="cell" href="https://translate.google.com/"><img width="88" height="88" src="gridlink802_files/image028.png" alt=":46641101_341755646612881_2190301757521788928_n.jpg"><span>Translate</span></a>
+
+    <!-- Row 5 -->
+    <a class="cell" href="https://www.office.com/"><img width="90" height="83" src="gridlink802_files/image038.png" alt=":12-121390_new-microsoft-word-icon.jpg"><span>Word</span></a>
+    <a class="cell" href="http://reddit.com/"><img width="69" height="69" src="gridlink802_files/image034.png" alt=":download.jpg"><span>Reddit</span></a>
+    <a class="cell" href="https://www.icloud.com/"><img width="96" height="72" src="gridlink802_files/image042.png" alt=":Untitled3.png"><span>iCloud</span></a>
+    <a class="cell" href="https://substack.com/"><img width="84" height="84" src="gridlink802_files/image044.png" alt=":146764906_553070912317831_8279515811549217968_n.jpg"><span>Substack</span></a>
+    <a class="cell" href="https://zoom.us"><img width="86" height="86" src="gridlink802_files/image046.png" alt=":146766516_280561410072827_2359571266199289347_n.jpg"><span>Zoom</span></a>
+
+    <!-- Row 6 -->
+    <a class="cell" href="https://www.wikipedia.org/"><img width="92" height="92" src="gridlink802_files/image048.png" alt=":0Zflj6Y__400x400.jpg"><span>Wikipedia</span></a>
+    <a class="cell" href="https://archive.org/"><img width="98" height="98" src="gridlink802_files/image050.png" alt=":46798333_359205647988555_3399141507234529280_n.jpg"><span>Archive</span></a>
+    <a class="cell" href="https://www.amazon.com/"><img width="90" height="90" src="gridlink802_files/image036.png" alt=":46508329_484062192002038_8837767287449583616_n.jpg"><span>Amazon</span></a>
+    <a class="cell" href="https://www.twitch.tv/"><img width="98" height="98" src="gridlink802_files/image054.png" alt=":146502592_705071116857908_717349071806388972_n.jpg"><span>Twitch</span></a>
+    <a class="cell" href="https://www.nytimes.com/"><img width="98" height="98" src="gridlink802_files/image056.png" alt=":47295520_195887364651839_6551721019453734912_n.jpg"><span>Nytimes</span></a>
+
+    <!-- Row 7 (icons only) -->
+    <a class="cell" href="http://gridlink.es/egg.htm"><img width="45" height="45" src="gridlink802_files/image058.png" alt=""></a>
+    <a class="cell" href="https://microsoft.com/store"><img width="44" height="44" src="gridlink802_files/image060.png" alt=":Untitled8.png"></a>
+    <a class="cell" href="http://appstore.com"><img width="35" height="35" src="gridlink802_files/image062.png" alt=""></a>
+    <a class="cell" href="https://play.google.com/store/apps/developer?id=GridLink&amp;hl=en"><img width="50" height="50" src="gridlink802_files/image064.png" alt=":bYyZI8Bp_400x400.jpg"></a>
+    <a class="cell" href="http://gridlink.es/egg.htm"><img width="45" height="45" src="gridlink802_files/image066.png" alt=""></a>
+
+    <!-- SECOND X TIMELINE -->
+    <div class="wide">
+      <a class="twitter-timeline" data-width="300" data-height="300" data-tweet-limit="1" data-theme="light" href="https://x.com/paniaguai?ref_src=twsrc%5Etfw" data-chrome="noheader nofooter noscrollbar noborders transparent"> </a>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var btn=document.getElementById('sound');
+  var on=false, ctx=null;
+  try{ on=localStorage.getItem('gridlink-sound')==='on'; }catch(e){}
+
+  function setUI(){ btn.setAttribute('aria-pressed',on?'true':'false'); }
+  setUI();
+
+  function audio(){
+    if(!ctx){
+      var AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC) return null;
+      ctx=new AC();
+    }
+    if(ctx.state==='suspended') ctx.resume();
+    return ctx;
+  }
+
+  function tone(freq,dur,type,vol,delay){
+    var c=audio(); if(!c) return;
+    var t=c.currentTime+(delay||0);
+    var o=c.createOscillator(), g=c.createGain();
+    o.type=type||'sine';
+    o.frequency.setValueAtTime(freq,t);
+    o.frequency.exponentialRampToValueAtTime(freq*1.35,t+dur);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(vol||0.05,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t+dur+0.02);
+  }
+
+  var sfx={
+    hover:function(i){ tone(520+(i%5)*70,0.09,'sine',0.035); },
+    click:function(){ tone(660,0.09,'triangle',0.06); tone(990,0.14,'triangle',0.05,0.07); },
+    on:function(){ tone(440,0.1,'triangle',0.06); tone(660,0.1,'triangle',0.06,0.09); tone(990,0.16,'triangle',0.06,0.18); },
+    off:function(){ tone(990,0.1,'triangle',0.05); tone(660,0.1,'triangle',0.05,0.09); tone(440,0.16,'triangle',0.05,0.18); }
+  };
+
+  btn.addEventListener('click',function(){
+    if(on){ sfx.off(); on=false; }
+    else{ on=true; sfx.on(); }
+    try{ localStorage.setItem('gridlink-sound',on?'on':'off'); }catch(e){}
+    setUI();
+  });
+
+  var cells=[].slice.call(document.querySelectorAll('a.cell'));
+  cells.forEach(function(el,i){
+    el.style.setProperty('--i',i);
+    el.addEventListener('pointerenter',function(e){
+      if(on && e.pointerType==='mouse') sfx.hover(i);
+    });
+    el.addEventListener('focus',function(){ if(on) sfx.hover(i); });
+    el.addEventListener('pointerdown',function(){ if(on) sfx.click(); });
+  });
+
+  var pill=document.querySelector('.pill');
+  pill.addEventListener('pointerenter',function(e){ if(on && e.pointerType==='mouse') sfx.hover(2); });
+  pill.addEventListener('pointerdown',function(){ if(on) sfx.click(); });
+})();
+</script>
+
+<!-- Analytics (kept from original) -->
+<script type="text/javascript"> var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-753644-2']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga); })(); </script>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YFX9SNNN5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YFX9SNNN5N');
+</script>
+
+</body>
+</html>
